@@ -8,9 +8,8 @@ if(!file_exists($baseAccesslogUrl)){
 
 $IFS=' ';
 $dataInTimes=[];
-$ispCache=[]; // cache برای اینکه هر آی‌پی فقط یک بار resolve بشه
+$ispCache=[];
 
-// تابع گرفتن org (ISP/Organization)
 function getOrg($ip, &$ispCache) {
     if (isset($ispCache[$ip])) {
         return $ispCache[$ip];
@@ -41,6 +40,7 @@ function mapOrgToISP($org) {
         'rightel' => ['/rightel/i'],
         'pars online' => ['/pars online/i'],
         'hiweb' => ['/hi.?web/i'],
+        'ShahroodUniNetwork' => ['Shahrood University of Technology']
     ];
 
     foreach ($rules as $isp => $patterns) {
@@ -125,4 +125,4 @@ while (($line = fgets($handle)) !== false) {
 }
 fclose($handle);
 
-file_put_contents('log.json', json_encode($dataInTimes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+file_put_contents('log.json', json_encode($dataInTimes));
