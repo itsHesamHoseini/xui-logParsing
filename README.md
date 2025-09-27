@@ -1,6 +1,6 @@
 # xui-logParsing
 
-A lightweight PHP-based CLI tool designed for **3X-UI VPN administrators** to detect and monitor clients who exceed the maximum allowed simultaneous connections.  
+A lightweight PHP-based CLI tool designed for **3X-UI VPN administrators** based on xray-core to detect and monitor clients who exceed the maximum allowed simultaneous connections.  
 It parses the `access.log` file, provides clear and colorful CLI reports, and optionally sends violation alerts directly to a Telegram bot.
 
 ---
