@@ -27,8 +27,8 @@ It parses the `access.log` file, provides clear and colorful CLI reports, and op
 1. Clone the repository:
  ```bash
  git clone https://github.com/itsHesamHoseini/xui-logParsing.git
- cd xui-logParsing```
-
+ cd xui-logParsing
+ ```
 
 2. Create a .env file in the project root with the following variables:
 ```env

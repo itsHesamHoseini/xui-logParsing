@@ -193,7 +193,7 @@ foreach($dataInTimes as $ymd=>$hises) {
     }
 }
 
-// -------------------------- START: Violation tracking & alerting --------------------------
+echo '-------------------------- START: Violation tracking & alerting in telegram --------------------------'.PHP_EOL;
 $violationsFile = __DIR__ . '/violations.json';
 $alertsCacheFile = __DIR__ . '/alerts_cache.json';
 $alertThrottleSeconds = getenv('ALERT_THROTTLE_SECONDS') ? (int)getenv('ALERT_THROTTLE_SECONDS') : 3600; // default 1h
@@ -350,4 +350,4 @@ foreach ($alertsToSend as $a) {
     ]);
 }
 
-// --------------------------- END: Violation tracking & alerting ---------------------------
+echo '--------------------------- END: Violation tracking & alerting in telegram ---------------------------';

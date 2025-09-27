@@ -238,6 +238,36 @@ function prettyLog($userId, $date, $time, $ips, $realUniqueIPSCount, $isSkipped=
     echo "Time: $time\n";
 
     renderTable($ips);
+
+
+    $intervals = [];
+    foreach ($ips as $r) {
+        if (!empty($r['time']) && !empty($r['last_time'])) {
+            $intervals[] = ['start'=>$r['time'], 'end'=>$r['last_time']];
+        }
+    }
+    $maxOverlapInterval = maxOverlapInterval($intervals, 3);
+
+    if ($maxOverlapInterval['ok']) {
+        $duration = $maxOverlapInterval['duration'];
+        $h = intdiv($duration, 3600); 
+        $duration %= 3600;
+        $m = intdiv($duration, 60);   
+        $s = $duration % 60;
+
+        $durationStr = 
+            ($h > 0 ? "{$h}h " : "") . 
+            ($m > 0 ? "{$m}min " : "") . 
+            ($s > 0 ? "{$s}s" : "");
+
+        echo "     Max Overlap Interval (≥3 IPs): {$boldRed}"
+        . "{$maxOverlapInterval['start']} - {$maxOverlapInterval['end']} "
+        . "({$durationStr}){$reset}\n";
+    } else {
+        echo "     Max Overlap Interval (≥3 IPs): {$boldGreen}No suspicious overlap found 🎉{$reset}\n";
+    }
+
+    // if()
 }
 
 function renderTable($rows) {
@@ -344,4 +374,71 @@ function getUniqueUsers($dataInTimes) {
 function getUniqueUsersCount($dataInTimes) {
     getUniqueUsers($dataInTimes);
     return count(getUniqueUsers($dataInTimes));
+}
+
+function hms_to_sec(string $t): int {
+    [$h, $m, $s] = array_map('intval', explode(':', $t));
+    return $h * 3600 + $m * 60 + $s;
+}
+
+function sec_to_hms(int $sec): string {
+    $sec = max(0, $sec);
+    $h = intdiv($sec, 3600); $sec %= 3600;
+    $m = intdiv($sec, 60);   $s   = $sec % 60;
+    return sprintf('%02d:%02d:%02d', $h, $m, $s);
+}
+
+
+function maxOverlapInterval(array $intervals, int $minOverlapCount = 2): array {
+    $fail = ['ok'=>false, 'start'=>null, 'end'=>null, 'duration'=>0];
+
+    if ($minOverlapCount < 2 || count($intervals) < $minOverlapCount) {
+        return $fail;
+    }
+
+    $events = [];
+    foreach ($intervals as $r) {
+        if (!isset($r['start'], $r['end'])) continue;
+        $s = hms_to_sec($r['start']);
+        $e = hms_to_sec($r['end']);
+        if ($e <= $s) continue;
+
+        $events[] = ['t'=>$s, 'delta'=>+1, 'type'=>0];
+        $events[] = ['t'=>$e, 'delta'=>-1, 'type'=>1];
+    }
+
+    if (empty($events)) return $fail;
+
+    usort($events, function($a, $b){
+        if ($a['t'] === $b['t']) return $a['type'] <=> $b['type'];
+        return $a['t'] <=> $b['t'];
+    });
+
+    $active = 0;
+    $lastT  = null;
+    $best   = ['len'=>0, 's'=>null, 'e'=>null];
+
+    foreach ($events as $ev) {
+        $t = $ev['t'];
+
+        if ($lastT !== null && $active >= $minOverlapCount && $t > $lastT) {
+            $len = $t - $lastT;
+            if ($len > $best['len']) {
+                $best = ['len'=>$len, 's'=>$lastT, 'e'=>$t];
+            }
+        }
+
+        $active += $ev['delta'];
+        $lastT = $t;
+    }
+
+    if ($best['len'] > 0) {
+        return [
+            'ok'       => true,
+            'start'    => sec_to_hms($best['s']),
+            'end'      => sec_to_hms($best['e']),
+            'duration' => $best['len'],
+        ];
+    }
+    return $fail;
 }
