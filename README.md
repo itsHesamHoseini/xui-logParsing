@@ -31,13 +31,15 @@ It parses the `access.log` file, provides clear and colorful CLI reports, and op
  ```
 
 2. Create a .env file in the project root with the following variables:
-```env
+ ```env
 API_KEY_TOKEN=your_telegram_bot_token
 FROM_ID=your_admin_numeric_id
-MAX_ALLOW_USER=2```
+MAX_ALLOW_USER=2
+ ```
 
 3.Run the script:
-```bash
-php FindAllConnectionIPS.php```
+ ```bash
+php FindAllConnectionIPS.php
+ ```
 
 📊 Example Output:
