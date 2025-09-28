@@ -45,3 +45,7 @@ php FindAllConnectionIPS.php
 📊 Example Output:
 <img width="1143" height="679" alt="image" src="https://github.com/user-attachments/assets/7bc525c6-b77d-420b-8244-8bcb1db9e2dd" />
 
+
+## TODOLIST:
+- [ ] Identify the connected client brand(Apple or Samsung or etc)
+- [ ] Block IP By Your Rules
